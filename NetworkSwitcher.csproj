@@ -9,7 +9,7 @@
     <AssemblyName>NetworkSwitcher</AssemblyName>
     <RootNamespace>NetworkSwitcher</RootNamespace>
     <NoWarn>$(NoWarn);NETSDK1233</NoWarn>
-    <DefaultItemExcludes>$(DefaultItemExcludes);SampleTrayApp.Tests\**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);NetworkSwitcher.Tests\**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>

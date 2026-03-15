@@ -10,13 +10,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Build
-dotnet build SampleTrayApp.csproj -c Release
+dotnet build NetworkSwitcher.csproj -c Release
 
 # Run tests (xUnit)
-dotnet test SampleTrayApp.Tests/SampleTrayApp.Tests.csproj
+dotnet test NetworkSwitcher.Tests/NetworkSwitcher.Tests.csproj
 
 # Publish
-dotnet publish SampleTrayApp.csproj -c Release -o bin/Release/net10.0-windows/publish
+dotnet publish NetworkSwitcher.csproj -c Release -o bin/Release/net10.0-windows/publish
 
 # Create a release (increments patch version, tags, and pushes)
 ./scripts/make-release
@@ -24,9 +24,9 @@ dotnet publish SampleTrayApp.csproj -c Release -o bin/Release/net10.0-windows/pu
 
 ## Architecture
 
-- **NetworkSwitcher** (`SampleTrayApp.csproj`) - .NET 10 WPF WinExe. `App.xaml` sets `ShutdownMode="OnExplicitShutdown"` so the app stays alive in the tray. `MainWindow.xaml` is a zero-size invisible window that hosts a `TaskbarIcon` from H.NotifyIcon. `NetworkMonitor.cs` handles WiFi detection and reconnection via `netsh`.
-- **SampleTrayApp.Tests** (`SampleTrayApp.Tests/`) - xUnit test project (currently placeholder).
-- **SampleTrayApp.Installer** (`SampleTrayApp.Installer/`) - WiX v3 MSI installer. Installs to Program Files, creates Start Menu/Desktop shortcuts, and registers auto-start via `HKLM\...\Run`.
+- **NetworkSwitcher** (`NetworkSwitcher.csproj`) - .NET 10 WPF WinExe. `App.xaml` sets `ShutdownMode="OnExplicitShutdown"` so the app stays alive in the tray. `MainWindow.xaml` is a zero-size invisible window that hosts a `TaskbarIcon` from H.NotifyIcon. `NetworkMonitor.cs` handles WiFi detection and reconnection via `netsh`.
+- **NetworkSwitcher.Tests** (`NetworkSwitcher.Tests/`) - xUnit test project (currently placeholder).
+- **NetworkSwitcher.Installer** (`NetworkSwitcher.Installer/`) - WiX v3 MSI installer. Installs to Program Files, creates Start Menu/Desktop shortcuts, and registers auto-start via `HKLM\...\Run`.
 
 ## Release Process
 

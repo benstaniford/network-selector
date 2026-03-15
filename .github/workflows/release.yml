@@ -61,7 +61,7 @@ jobs:
       - name: Update WiX Product Version
         run: |
           $version = "${{ steps.version.outputs.NUMERIC_VERSION }}"
-          $wxsPath = "SampleTrayApp.Installer/Product.wxs"
+          $wxsPath = "NetworkSwitcher.Installer/Product.wxs"
 
           Write-Host "Updating Product.wxs with version: $version"
 
@@ -74,22 +74,22 @@ jobs:
           Get-Content $wxsPath | Select-String "define ProductVersion"
 
       - name: Restore dependencies
-        run: dotnet restore SampleTrayApp.csproj
+        run: dotnet restore NetworkSwitcher.csproj
 
       - name: Build application
-        run: dotnet build SampleTrayApp.csproj -c Release --no-restore -p:Version=${{ steps.version.outputs.NUMERIC_VERSION }}
+        run: dotnet build NetworkSwitcher.csproj -c Release --no-restore -p:Version=${{ steps.version.outputs.NUMERIC_VERSION }}
 
       - name: Run tests
-        run: dotnet test SampleTrayApp.Tests/SampleTrayApp.Tests.csproj -c Release --logger "console;verbosity=normal"
+        run: dotnet test NetworkSwitcher.Tests/NetworkSwitcher.Tests.csproj -c Release --logger "console;verbosity=normal"
 
       - name: Publish application
-        run: dotnet publish SampleTrayApp.csproj -c Release -o bin/Release/net10.0-windows/publish --no-build -p:Version=${{ steps.version.outputs.NUMERIC_VERSION }}
+        run: dotnet publish NetworkSwitcher.csproj -c Release -o bin/Release/net10.0-windows/publish --no-build -p:Version=${{ steps.version.outputs.NUMERIC_VERSION }}
 
       - name: Build WiX Installer
         run: |
           $env:PATH += ";C:\Program Files (x86)\WiX Toolset v3.11\bin"
           Write-Host "Building WiX installer..."
-          msbuild SampleTrayApp.Installer/SampleTrayApp.Installer.wixproj /p:Configuration=Release /p:Platform=x64 /v:normal
+          msbuild NetworkSwitcher.Installer/NetworkSwitcher.Installer.wixproj /p:Configuration=Release /p:Platform=x64 /v:normal
           if ($LASTEXITCODE -ne 0) {
             Write-Host "WiX build failed with exit code: $LASTEXITCODE"
             exit $LASTEXITCODE
@@ -101,9 +101,9 @@ jobs:
           $version = "${{ steps.version.outputs.NUMERIC_VERSION }}"
 
           Write-Host "Looking for MSI files..."
-          Get-ChildItem SampleTrayApp.Installer -Recurse -ErrorAction SilentlyContinue | Where-Object {$_.Extension -eq ".msi"} | Format-Table FullName, Length
+          Get-ChildItem NetworkSwitcher.Installer -Recurse -ErrorAction SilentlyContinue | Where-Object {$_.Extension -eq ".msi"} | Format-Table FullName, Length
 
-          $originalPath = "SampleTrayApp.Installer/bin/x64/Release/NetworkSwitcherSetup.msi"
+          $originalPath = "NetworkSwitcher.Installer/bin/x64/Release/NetworkSwitcherSetup.msi"
           $newFileName = "NetworkSwitcherSetup-v$version-x64.msi"
 
           if (Test-Path $originalPath) {
