@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace SampleTrayApp;
+namespace NetworkSwitcher;
 
 internal sealed partial class App : Application
 {

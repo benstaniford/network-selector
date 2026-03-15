@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace SampleTrayApp.Tests;
+namespace NetworkSwitcher.Tests;
 
 public class PlaceholderTests
 {

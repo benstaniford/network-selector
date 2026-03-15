@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 
-namespace SampleTrayApp;
+namespace NetworkSwitcher;
 
 internal sealed partial class NetworkMonitor : IDisposable
 {

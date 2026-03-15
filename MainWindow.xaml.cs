@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Windows;
 
-namespace SampleTrayApp;
+namespace NetworkSwitcher;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by WPF XAML framework")]
 internal sealed partial class MainWindow : Window, IDisposable
@@ -30,8 +30,8 @@ internal sealed partial class MainWindow : Window, IDisposable
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "dev";
         Dispatcher.BeginInvoke(() =>
             MessageBox.Show(
-                $"Network Selector v{version}\n\nMonitors WiFi and keeps you connected to vodafoneC72225.",
-                "About Network Selector",
+                $"Network Switcher v{version}\n\nMonitors WiFi and keeps you connected to vodafoneC72225.",
+                "About Network Switcher",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information));
     }

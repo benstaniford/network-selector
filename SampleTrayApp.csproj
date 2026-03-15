@@ -6,6 +6,8 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>icons\app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>NetworkSwitcher</AssemblyName>
+    <RootNamespace>NetworkSwitcher</RootNamespace>
     <NoWarn>$(NoWarn);NETSDK1233</NoWarn>
     <DefaultItemExcludes>$(DefaultItemExcludes);SampleTrayApp.Tests\**</DefaultItemExcludes>
   </PropertyGroup>
