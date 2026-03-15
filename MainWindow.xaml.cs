@@ -4,7 +4,7 @@ using System.Windows;
 namespace SampleTrayApp;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by WPF XAML framework")]
-internal sealed partial class MainWindow : Window
+internal sealed partial class MainWindow : Window, IDisposable
 {
     private readonly NetworkMonitor _monitor = new();
 
@@ -35,6 +35,8 @@ internal sealed partial class MainWindow : Window
                 MessageBoxButton.OK,
                 MessageBoxImage.Information));
     }
+
+    public void Dispose() => _monitor.Dispose();
 
     private void Exit_Click(object sender, RoutedEventArgs e)
     {
