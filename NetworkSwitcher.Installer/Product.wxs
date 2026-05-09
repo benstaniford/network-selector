@@ -135,7 +135,7 @@
          Manual launches via shortcuts go through `schtasks /Run` which also bypasses UAC. -->
     <CustomAction Id="SetCreateTaskCmd"
                   Property="CreateTask"
-                  Value='"[SystemFolder]schtasks.exe" /Create /TN "$(var.TaskName)" /TR "\"[#NetworkSwitcherEXE]\"" /SC ONLOGON /RL HIGHEST /F' />
+                  Value='"[SystemFolder]schtasks.exe" /Create /TN "$(var.TaskName)" /TR "\"[#NetworkSwitcherEXE]\"" /SC ONLOGON /RL HIGHEST /RU "[%USERDOMAIN]\[LogonUser]" /F' />
     <CustomAction Id="CreateTask"
                   BinaryKey="WixCA"
                   DllEntry="CAQuietExec"
