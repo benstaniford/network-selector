@@ -21,4 +21,8 @@
     <None Include="icons\app.ico" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="NetworkSwitcher.Tests" />
+  </ItemGroup>
+
 </Project>

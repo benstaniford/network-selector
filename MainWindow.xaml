@@ -19,6 +19,7 @@
                 <ContextMenu>
                     <MenuItem x:Name="StatusMenuItem" Header="Checking..." IsEnabled="False"/>
                     <Separator/>
+                    <MenuItem Header="Preferences..." Click="Preferences_Click"/>
                     <MenuItem Header="About" Click="About_Click"/>
                     <Separator/>
                     <MenuItem Header="Exit" Click="Exit_Click"/>

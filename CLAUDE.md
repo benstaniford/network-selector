@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Network Switcher** — a Windows system tray application built with .NET 10 / WPF using the [H.NotifyIcon.Wpf](https://github.com/HardcodetNet/H.NotifyIcon) library. The app runs as a tray icon, monitors the active WiFi connection, and automatically reconnects to `vodafoneC72225` if the connection changes. It includes a WiX v3 MSI installer and a GitHub Actions release pipeline.
+**Network Switcher** — a Windows system tray application built with .NET 10 / WPF using the [H.NotifyIcon.Wpf](https://github.com/HardcodetNet/H.NotifyIcon) library. The app runs as a tray icon, monitors the active WiFi connection, and automatically reconnects to a configurable SSID (default `vodafoneC72225`) if the connection changes. A Preferences dialog lets the user change the desired SSID and opt in to disabling Ethernet adapters when detected; settings are persisted under `HKCU\Software\NetworkSwitcher`. It includes a WiX v3 MSI installer and a GitHub Actions release pipeline.
 
 ## Build & Test Commands
 
@@ -24,8 +24,8 @@ dotnet publish NetworkSwitcher.csproj -c Release -o bin/Release/net10.0-windows/
 
 ## Architecture
 
-- **NetworkSwitcher** (`NetworkSwitcher.csproj`) - .NET 10 WPF WinExe. `App.xaml` sets `ShutdownMode="OnExplicitShutdown"` so the app stays alive in the tray. `MainWindow.xaml` is a zero-size invisible window that hosts a `TaskbarIcon` from H.NotifyIcon. `NetworkMonitor.cs` handles WiFi detection and reconnection via `netsh`.
-- **NetworkSwitcher.Tests** (`NetworkSwitcher.Tests/`) - xUnit test project (currently placeholder).
+- **NetworkSwitcher** (`NetworkSwitcher.csproj`) - .NET 10 WPF WinExe. `App.xaml` sets `ShutdownMode="OnExplicitShutdown"` so the app stays alive in the tray. `MainWindow.xaml` is a zero-size invisible window that hosts a `TaskbarIcon` from H.NotifyIcon. `NetworkMonitor.cs` handles WiFi detection and reconnection via `netsh` and (optionally) disables Ethernet adapters. `Settings.cs` reads/writes preferences from the registry. `PreferencesWindow.xaml` is the user-facing settings dialog.
+- **NetworkSwitcher.Tests** (`NetworkSwitcher.Tests/`) - xUnit test project covering `Settings` registry persistence (targets `net10.0-windows`).
 - **NetworkSwitcher.Installer** (`NetworkSwitcher.Installer/`) - WiX v3 MSI installer. Installs to Program Files, creates Start Menu/Desktop shortcuts, and registers auto-start via `HKLM\...\Run`.
 
 ## Release Process

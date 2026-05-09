@@ -28,12 +28,23 @@ internal sealed partial class MainWindow : Window, IDisposable
     {
         var version = Assembly.GetExecutingAssembly()
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "dev";
+        var settings = Settings.Load();
         Dispatcher.BeginInvoke(() =>
             MessageBox.Show(
-                $"Network Switcher v{version}\n\nMonitors WiFi and keeps you connected to vodafoneC72225.",
+                $"Network Switcher v{version}\n\nMonitors WiFi and keeps you connected to {settings.DesiredSsid}.",
                 "About Network Switcher",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information));
+    }
+
+    private void Preferences_Click(object sender, RoutedEventArgs e)
+    {
+        var settings = Settings.Load();
+        var dialog = new PreferencesWindow(settings);
+        if (dialog.ShowDialog() == true)
+        {
+            _monitor.TriggerCheck();
+        }
     }
 
     public void Dispose() => _monitor.Dispose();

@@ -6,11 +6,11 @@ namespace NetworkSwitcher;
 
 internal sealed partial class NetworkMonitor : IDisposable
 {
-    private const string TargetSsid = "vodafoneC72225";
     private const int PreferredWifiMetric = 1;
     private static readonly TimeSpan SwitchCooldown = TimeSpan.FromSeconds(5);
 
     private readonly Timer _pollTimer;
+    private readonly HashSet<string> _disabledEthernetAdapters = new(StringComparer.OrdinalIgnoreCase);
     private DateTime _lastSwitchAttempt = DateTime.MinValue;
     private string? _wifiInterfaceName;
     private bool _metricLowered;
@@ -31,6 +31,8 @@ internal sealed partial class NetworkMonitor : IDisposable
         _pollTimer.Change(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
     }
 
+    public void TriggerCheck() => Task.Run(EnsureConnectedToTarget);
+
     private void OnNetworkAddressChanged(object? sender, EventArgs e) =>
         Task.Run(EnsureConnectedToTarget);
 
@@ -39,12 +41,16 @@ internal sealed partial class NetworkMonitor : IDisposable
 
     private void EnsureConnectedToTarget()
     {
+        var settings = Settings.Load();
+        var targetSsid = settings.DesiredSsid;
+        ApplyEthernetSetting(settings.DisableEthernet);
+
         var current = GetCurrentSsid();
 
-        if (current == TargetSsid)
+        if (current == targetSsid)
         {
             ApplyWifiPreference();
-            StatusChanged?.Invoke(this, $"Connected to {TargetSsid}");
+            StatusChanged?.Invoke(this, $"Connected to {targetSsid}");
             return;
         }
 
@@ -56,20 +62,20 @@ internal sealed partial class NetworkMonitor : IDisposable
 
         _lastSwitchAttempt = DateTime.Now;
         var from = current is null ? "no WiFi" : $"\"{current}\"";
-        StatusChanged?.Invoke(this, $"Switching from {from} to {TargetSsid}...");
-        ConnectToTarget();
+        StatusChanged?.Invoke(this, $"Switching from {from} to {targetSsid}...");
+        ConnectToTarget(targetSsid);
 
         // Brief wait then re-check to emit updated status
         Thread.Sleep(3000);
         var after = GetCurrentSsid();
-        if (after == TargetSsid)
+        if (after == targetSsid)
         {
             ApplyWifiPreference();
-            StatusChanged?.Invoke(this, $"Connected to {TargetSsid}");
+            StatusChanged?.Invoke(this, $"Connected to {targetSsid}");
         }
         else
         {
-            StatusChanged?.Invoke(this, $"Failed to connect to {TargetSsid}");
+            StatusChanged?.Invoke(this, $"Failed to connect to {targetSsid}");
         }
     }
 
@@ -94,6 +100,40 @@ internal sealed partial class NetworkMonitor : IDisposable
         _metricLowered = false;
     }
 
+    private void ApplyEthernetSetting(bool disable)
+    {
+        if (disable)
+        {
+            foreach (var adapter in GetEthernetAdapters())
+            {
+                if (adapter.OperationalStatus != OperationalStatus.Up)
+                    continue;
+                RunNetsh($"interface set interface name=\"{adapter.Name}\" admin=disabled");
+                _disabledEthernetAdapters.Add(adapter.Name);
+            }
+        }
+        else if (_disabledEthernetAdapters.Count > 0)
+        {
+            ReenableTrackedEthernetAdapters();
+        }
+    }
+
+    private void ReenableTrackedEthernetAdapters()
+    {
+        foreach (var name in _disabledEthernetAdapters)
+        {
+            RunNetsh($"interface set interface name=\"{name}\" admin=enabled");
+        }
+        _disabledEthernetAdapters.Clear();
+    }
+
+    private static IEnumerable<NetworkInterface> GetEthernetAdapters() =>
+        NetworkInterface.GetAllNetworkInterfaces()
+            .Where(n => n.NetworkInterfaceType is NetworkInterfaceType.Ethernet
+                or NetworkInterfaceType.GigabitEthernet
+                or NetworkInterfaceType.FastEthernetT
+                or NetworkInterfaceType.FastEthernetFx);
+
     private static string? GetWifiInterfaceName()
     {
         var output = RunNetsh("wlan show interfaces");
@@ -108,8 +148,8 @@ internal sealed partial class NetworkMonitor : IDisposable
         return match.Success ? match.Groups[1].Value.Trim() : null;
     }
 
-    private static void ConnectToTarget() =>
-        RunNetsh($"wlan connect name=\"{TargetSsid}\"");
+    private static void ConnectToTarget(string targetSsid) =>
+        RunNetsh($"wlan connect name=\"{targetSsid}\"");
 
     private static string RunNetsh(string args) => RunProcess("netsh", args);
 
@@ -146,5 +186,6 @@ internal sealed partial class NetworkMonitor : IDisposable
         NetworkChange.NetworkAddressChanged -= OnNetworkAddressChanged;
         _pollTimer.Dispose();
         RestoreWifiMetric();
+        ReenableTrackedEthernetAdapters();
     }
 }
